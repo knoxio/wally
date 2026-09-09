@@ -50,10 +50,10 @@ export function panelToPixel(
     case 'contain': {
       const sx = iw / opts.panelWidthMm;
       const sy = ih / opts.panelHeightMm;
-      const s = opts.fitMode === 'cover' ? Math.max(sx, sy) : Math.min(sx, sy);
+      const s = opts.fitMode === 'cover' ? Math.min(sx, sy) : Math.max(sx, sy);
       const u = (xMm - opts.panelWidthMm / 2) * s + iw / 2;
       const v = (yMm - opts.panelHeightMm / 2) * s + ih / 2;
-      if (opts.fitMode === 'contain' && (u < -0.5 || v < -0.5 || u > iw - 0.5 || v > ih - 0.5)) return null;
+      if (opts.fitMode === 'contain' && (u < 0 || v < 0 || u > iw || v > ih)) return null;
       return { u, v, wrap: false };
     }
   }

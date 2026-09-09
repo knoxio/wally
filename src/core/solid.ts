@@ -34,6 +34,14 @@ export function buildSolid(solid: FieldSolid): Mesh {
   if (nx < 2 || ny < 2) throw new Error('A field solid needs at least two samples on each axis.');
   const b = createMeshBuilder();
   const at = (i: number, j: number): number => j * nx + i;
+  // A grid cell is wound counter-clockwise in the xy plane only when the two
+  // axes disagree in direction. Ascending y therefore has to flip every facet,
+  // or the whole solid comes out inside-out.
+  const flip = (xs[1] ?? 1) > (xs[0] ?? 0) === (ys[1] ?? 1) > (ys[0] ?? 0);
+  const tri = (a: number, c: number, d: number): void => {
+    if (flip) b.addTriangle(a, d, c);
+    else b.addTriangle(a, c, d);
+  };
 
   const topIndex = new Uint32Array(nx * ny);
   for (let j = 0; j < ny; j++) {
@@ -54,11 +62,11 @@ export function buildSolid(solid: FieldSolid): Mesh {
       const zd = top[at(i, j + 1)] ?? 0;
       // Split along the flatter diagonal so the facets follow the surface.
       if (Math.abs(za - zc) <= Math.abs(zb - zd)) {
-        b.addTriangle(a, c, bb);
-        b.addTriangle(a, d, c);
+        tri(a, c, bb);
+        tri(a, d, c);
       } else {
-        b.addTriangle(a, d, bb);
-        b.addTriangle(bb, d, c);
+        tri(a, d, bb);
+        tri(bb, d, c);
       }
     }
   }
@@ -102,11 +110,11 @@ export function buildSolid(solid: FieldSolid): Mesh {
         const zb = bottom[at(i + 1, j)] ?? 0;
         const zd = bottom[at(i, j + 1)] ?? 0;
         if (Math.abs(za - zc) <= Math.abs(zb - zd)) {
-          b.addTriangle(a, bb, c);
-          b.addTriangle(a, c, d);
+          tri(a, bb, c);
+          tri(a, c, d);
         } else {
-          b.addTriangle(a, bb, d);
-          b.addTriangle(bb, c, d);
+          tri(a, bb, d);
+          tri(bb, c, d);
         }
       }
     }
