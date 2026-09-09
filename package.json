@@ -1,0 +1,29 @@
+{
+  "name": "wally",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic PNG heightmap to tiled printable relief STL generator",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "export": "tsx src/cli/export.ts",
+    "ci": "pnpm typecheck && pnpm test && vite build"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2",
+    "pngjs": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pngjs": "^6.0.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8"
+  }
+}
