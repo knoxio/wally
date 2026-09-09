@@ -20,6 +20,11 @@ With the defaults, from one PNG:
 
 Every tile is 2 mm of base with the pattern standing 3.75 mm proud of it.
 
+The defaults are set for a seamless Pattern Monster export: `repeat` fit at a
+450 mm repeat, which lands exactly three repeats across the panel and aligns the
+motif to the 150 mm tile grid, with no cropping and no distortion. Use `cover`
+or `stretch` if your source is a single image rather than a tiling pattern.
+
 ## Use
 
 ```sh

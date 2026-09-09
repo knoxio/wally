@@ -76,12 +76,12 @@ export const DEFAULT_PARAMS: Params = {
 
   invert: false,
   threshold: 0.5,
-  fitMode: 'cover',
+  fitMode: 'repeat',
   repeatWidthMm: 450,
   heightMode: 'binary',
 
   cornerRadiusMm: 1.2,
-  bevelWidthMm: 2.4,
+  bevelWidthMm: 1.2,
   bevelBias: 0.2,
   profile: 'filleted',
   baseFilletFrac: 0.35,
