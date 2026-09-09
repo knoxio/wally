@@ -86,7 +86,7 @@ export const DEFAULT_PARAMS: Params = {
   profile: 'filleted',
   baseFilletFrac: 0.35,
   topRoundFrac: 0.25,
-  tileEdgeChamferMm: 1.5,
+  tileEdgeChamferMm: 2,
 
   interlockEnabled: true,
   rebateDepthMm: 1,

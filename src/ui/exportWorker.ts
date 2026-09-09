@@ -1,5 +1,5 @@
 import { zipSync } from 'fflate';
-import { generate } from '../core/generate.js';
+import { artifactCount, generate } from '../core/generate.js';
 import type { RasterImage } from '../core/image.js';
 import type { Params } from '../core/params.js';
 import type { ExportInboundMessage, ExportOutboundMessage } from './exportProtocol.js';
@@ -19,7 +19,7 @@ async function run(image: RasterImage, params: Params): Promise<void> {
   try {
     const files: Record<string, Uint8Array> = {};
     const gen = generate(image, params);
-    const total = params.rows * params.columns;
+    const total = artifactCount(params);
     let index = 0;
     let step = gen.next();
     while (!step.done) {
