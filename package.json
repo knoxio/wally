@@ -12,7 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "export": "tsx src/cli/export.ts",
-    "ci": "pnpm typecheck && pnpm test && vite build"
+    "verify": "pnpm run typecheck && pnpm run test && vite build"
   },
   "dependencies": {
     "fflate": "^0.8.2",

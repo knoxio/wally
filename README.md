@@ -133,5 +133,5 @@ less.
 ```sh
 pnpm typecheck   # tsc --noEmit
 pnpm test        # vitest
-pnpm ci          # typecheck, test, build
+pnpm verify      # typecheck, test, build
 ```
