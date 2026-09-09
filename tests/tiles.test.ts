@@ -170,7 +170,7 @@ describe('sliceTile', () => {
 });
 
 describe('the tile edge chamfer', () => {
-  const p = testParams({ tileEdgeChamferMm: 3, interlockEnabled: false, magnetsEnabled: false });
+  const p = testParams({ tileEdgeChamferMm: 3, interlockEnabled: false, magnetsEnabled: false, fitMode: 'stretch' });
   const heightmap = buildHeightmap(IMAGE, p);
   const chamfered = sliceTile(heightmap, p, 1, 1);
   const plain = sliceTile(heightmap, { ...p, tileEdgeChamferMm: 0 }, 1, 1);
