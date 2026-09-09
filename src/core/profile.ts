@@ -12,17 +12,12 @@ export interface ProfileSpec {
 export const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 
 /**
- * Normalised fillet fractions, scaled down together if they would consume more
- * than the whole band. Returns the straight-section slope `m` alongside them.
+ * Fillet fractions clamped to the half-band each may occupy, which bounds their
+ * sum at one whole band. Returns the straight-section slope `m` alongside them.
  */
 export function resolveFillets(spec: ProfileSpec): { fb: number; ft: number; m: number } {
-  let fb = Math.min(0.5, Math.max(0, spec.baseFilletFrac));
-  let ft = Math.min(0.5, Math.max(0, spec.topRoundFrac));
-  const total = fb + ft;
-  if (total > 1) {
-    fb /= total;
-    ft /= total;
-  }
+  const fb = Math.min(0.5, Math.max(0, spec.baseFilletFrac));
+  const ft = Math.min(0.5, Math.max(0, spec.topRoundFrac));
   return { fb, ft, m: 1 / (1 - (fb + ft) / 2) };
 }
 
@@ -61,7 +56,8 @@ export function evaluateProfile(spec: ProfileSpec, t: number): number {
 /**
  * Radii of curvature, in millimetres, where the slope meets the base plane and
  * the plateau. Only meaningful for the `filleted` profile; other profiles report
- * their own curvature at those points, and `linear` reports Infinity (a crease).
+ * their own curvature at those points, and `linear` reports zero because it
+ * arrives at both ends as a crease.
  */
 export function filletRadiiMm(spec: ProfileSpec, bandWidthMm: number, heightMm: number): { base: number; top: number } {
   if (bandWidthMm <= 0 || heightMm <= 0) return { base: 0, top: 0 };

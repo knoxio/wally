@@ -34,6 +34,8 @@ export interface Params {
   baseFilletFrac: number;
   /** Fraction of the bevel band spent on the convex round-over where the slope meets the raised plateau. */
   topRoundFrac: number;
+  /** Width of the band in which the relief eases back down to the base plane at the tile border. */
+  tileEdgeChamferMm: number;
 
   interlockEnabled: boolean;
   rebateDepthMm: number;
@@ -84,6 +86,7 @@ export const DEFAULT_PARAMS: Params = {
   profile: 'filleted',
   baseFilletFrac: 0.35,
   topRoundFrac: 0.25,
+  tileEdgeChamferMm: 1.5,
 
   interlockEnabled: true,
   rebateDepthMm: 1,
@@ -128,6 +131,7 @@ export function validate(p: Params): ValidationIssue[] {
   if (p.baseFilletFrac < 0 || p.baseFilletFrac > 0.5) err('Base fillet fraction must be between 0 and 0.5.');
   if (p.topRoundFrac < 0 || p.topRoundFrac > 0.5) err('Top round fraction must be between 0 and 0.5.');
   if (p.fitMode === 'repeat' && !(p.repeatWidthMm > 0)) err('Repeat width must be positive.');
+  if (p.tileEdgeChamferMm < 0) err('Tile edge chamfer cannot be negative.');
 
   const tileW = p.panelWidthMm / p.columns;
   const tileH = p.panelHeightMm / p.rows;
@@ -142,6 +146,7 @@ export function validate(p: Params): ValidationIssue[] {
       warn(`Only ${(p.baseThicknessMm - p.rebateDepthMm).toFixed(2)} mm of material remains over each rebate.`);
     }
   }
+  if (p.tileEdgeChamferMm * 2 >= Math.min(tileW, tileH)) err('Tile edge chamfer would consume the whole tile.');
   if (p.magnetsEnabled) {
     if (p.magnetDepthMm >= p.baseThicknessMm) err('Magnet pocket depth must be less than base thickness.');
     if (p.magnetInsetMm * 2 >= Math.min(tileW, tileH)) err('Magnet inset places pockets outside the tile.');
@@ -153,6 +158,12 @@ export function validate(p: Params): ValidationIssue[] {
   }
   if (p.interlockEnabled && p.rebateWidthMm < grid.pitchX * 3) {
     warn('Rebate width spans fewer than three samples and will be badly quantised.');
+  }
+  if (p.tileEdgeChamferMm > 0 && p.tileEdgeChamferMm < grid.pitchX * 2) {
+    warn('Tile edge chamfer is narrower than two samples and will print as a hard lip rather than an eased edge.');
+  }
+  if (p.magnetsEnabled && p.magnetDiameterMm < grid.pitchX * 8) {
+    warn('Magnet pockets are quantised to the sample grid and will be too rough to hold a magnet at this pitch.');
   }
   if (p.reliefHeightMm < 0.6) warn('Relief height is below three 0.2 mm layers.');
   return issues;
