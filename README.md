@@ -66,6 +66,12 @@ Export downloads the whole set as a zip.
 
 The preview uses `previewPitchMm`; the export always uses `samplePitchMm`.
 
+The browser holds the whole export in memory before zipping it, so a full
+1350 x 750 mm panel at the default 0.4 mm pitch is about 1.3 GB and will not
+survive a browser tab. The readout warns when the export gets that large. Use
+the command line for production panels; the browser is for finding your
+settings.
+
 ## Geometry
 
 **One height field, then cut.** The panel is evaluated once, on a single grid.
@@ -128,6 +134,12 @@ plate one at a time.
 
 The 5 mm mounting gaps are not part of any STL. The mounted panel is therefore
 larger than the modelled panel: 1390 x 770 mm with the default gaps.
+
+The sample pitch defaults to 0.4 mm to match the nozzle. Going coarser makes
+curved edges step visibly and, below three samples across the bevel band, stops
+the fillet profile forming at all: the slope collapses into a cliff. The
+validator warns when that happens. A 45-tile panel is about 1.3 GB at 0.4 mm and
+takes 20 seconds to write.
 
 Material figures reported by the tool are solid volume — the upper bound a 100 %
 infill print would reach. A real print with sparse infill uses substantially

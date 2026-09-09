@@ -1,7 +1,7 @@
 import type { Heightmap } from '../core/heightmap.js';
 import { resolveGrid, validate, type Params, type ValidationIssue } from '../core/params.js';
 import { mountedSizeMm } from '../core/placement.js';
-import { estimatePanelMaterial, estimateTotalTriangles } from './panelStats.js';
+import { estimateExportBytes, estimatePanelMaterial, estimateTotalTriangles } from './panelStats.js';
 
 function fmt(n: number, digits = 1): string {
   return n.toLocaleString(undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits });
@@ -17,6 +17,8 @@ export interface ReadoutResult {
  * `statsEl` and `issuesEl`. Returns the current issues so the caller can gate
  * the export button on `blocked`.
  */
+const BROWSER_EXPORT_LIMIT_BYTES = 500e6;
+
 export function renderReadout(
   statsEl: HTMLElement,
   issuesEl: HTMLElement,
@@ -28,6 +30,7 @@ export function renderReadout(
   const tileThickness = p.baseThicknessMm + p.reliefHeightMm;
   const material = previewHeightmap === null ? null : estimatePanelMaterial(previewHeightmap, p);
   const triangles = estimateTotalTriangles(p);
+  const exportBytes = estimateExportBytes(p);
 
   const rows: Array<[string, string]> = [
     ['Tile size', `${fmt(exportGrid.tileWidthMm, 1)} x ${fmt(exportGrid.tileHeightMm, 1)} mm`],
@@ -35,6 +38,7 @@ export function renderReadout(
     ['Mounted panel (incl. gaps)', `${fmt(mounted.widthMm, 1)} x ${fmt(mounted.heightMm, 1)} mm`],
     ['Resolved sample pitch', `${fmt(exportGrid.pitchX, 3)} x ${fmt(exportGrid.pitchY, 3)} mm`],
     ['Estimated triangles', triangles.toLocaleString()],
+    ['Estimated download', `${fmt(exportBytes / 1e9, 2)} GB`],
     [
       'Estimated solid volume',
       material === null ? 'load an image' : `${fmt(material.volumeMm3 / 1000, 1)} cm³ (100% infill upper bound)`,
@@ -58,6 +62,15 @@ export function renderReadout(
     const li = document.createElement('li');
     li.className = issue.level === 'error' ? 'issue issue-error' : 'issue issue-warning';
     li.textContent = issue.message;
+    issuesEl.appendChild(li);
+  }
+
+  if (exportBytes > BROWSER_EXPORT_LIMIT_BYTES) {
+    const li = document.createElement('li');
+    li.className = 'issue issue-warning';
+    li.textContent =
+      `This export is about ${fmt(exportBytes / 1e9, 2)} GB. The browser has to hold all of it in memory ` +
+      'before zipping and will likely run out; use the command line exporter for a panel this size.';
     issuesEl.appendChild(li);
   }
 

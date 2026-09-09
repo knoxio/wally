@@ -125,7 +125,7 @@ describe('validate', () => {
 
   const warningCases: ReadonlyArray<readonly [string, Partial<Params>, string]> = [
     ['a rebate that leaves under 0.6 mm of material', { baseThicknessMm: 2, rebateDepthMm: 1.5 }, 'remains over each rebate'],
-    ['a sample pitch coarser than the bevel band', { bevelWidthMm: 0.5 }, 'coarser than the bevel band'],
+    ['a bevel too narrow to resolve at the sample pitch', { bevelWidthMm: 0.5 }, 'fillet profile cannot form'],
     ['a rebate narrower than three samples', { samplePitchMm: 3, rebateWidthMm: 5, tileEdgeChamferMm: 6 }, 'fewer than three samples'],
     ['a chamfer narrower than two samples', { samplePitchMm: 3, tileEdgeChamferMm: 3 }, 'print as a hard lip'],
     ['magnets smaller than eight samples', { magnetsEnabled: true, magnetDiameterMm: 6 }, 'too rough to hold a magnet'],
