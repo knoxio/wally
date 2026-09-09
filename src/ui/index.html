@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wally — relief panel builder</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <aside id="controls-panel">
+        <div class="panel-header">
+          <h1>Wally</h1>
+          <button id="reset-btn" type="button" class="secondary">Reset to defaults</button>
+        </div>
+
+        <div id="dropzone" class="dropzone">
+          <p>Drop a PNG here, or</p>
+          <label class="file-picker">
+            <span>choose a file</span>
+            <input id="file-input" type="file" accept="image/png" />
+          </label>
+          <p id="file-name" class="file-name"></p>
+        </div>
+
+        <div id="controls"></div>
+      </aside>
+
+      <main id="preview-panel">
+        <div id="canvas-wrap">
+          <canvas id="preview-canvas"></canvas>
+          <p id="preview-placeholder" class="preview-placeholder">Load a PNG to see the relief preview.</p>
+        </div>
+
+        <section id="readout-panel">
+          <div id="readout-info">
+            <dl id="stats" class="stats"></dl>
+            <ul id="issues" class="issues"></ul>
+          </div>
+          <div id="readout-actions">
+            <div id="export-row">
+              <button id="export-btn" type="button" disabled>Export ZIP</button>
+            </div>
+            <div id="progress" class="progress" hidden>
+              <div class="progress-track">
+                <div id="progress-fill" class="progress-fill"></div>
+              </div>
+              <span id="progress-label" class="progress-label"></span>
+              <button id="cancel-btn" type="button" class="secondary">Cancel</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
