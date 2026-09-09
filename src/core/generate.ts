@@ -45,6 +45,16 @@ export interface GenerateOptions {
 }
 
 /**
+ * How many artefacts `generate` will yield for these parameters: one STL per
+ * tile, the connector when the tiles interlock, both placement maps and the
+ * manifest. Progress reporting needs this up front, and deriving it here keeps
+ * it from drifting away from what `generate` actually emits.
+ */
+export function artifactCount(p: Params): number {
+  return p.rows * p.columns + (p.interlockEnabled ? 1 : 0) + 3;
+}
+
+/**
  * Produces every file for a panel, one at a time.
  *
  * This is a generator so that a 45-tile panel never has to hold 45 meshes in

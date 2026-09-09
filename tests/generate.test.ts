@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { generate, type Artifact, type GenerateOptions, type GenerateReport } from '../src/core/generate.js';
+import { artifactCount, generate, type Artifact, type GenerateOptions, type GenerateReport } from '../src/core/generate.js';
 import type { RasterImage } from '../src/core/image.js';
 import { connectorCount } from '../src/core/connector.js';
 import { mountedSizeMm } from '../src/core/placement.js';
 import type { Params } from '../src/core/params.js';
 import { testParams } from './helpers/params.js';
 import { buildHeightmap } from '../src/core/heightmap.js';
-import { checkerboard } from './helpers/raster.js';
+import { checkerboard, stripes } from './helpers/raster.js';
 
 interface Run {
   readonly paths: string[];
@@ -189,5 +189,20 @@ describe('generate', () => {
     expect(Array.from(rebuilt.files.get('r01-c01.stl') ?? [])).not.toEqual(
       Array.from(fromImage.files.get('r01-c01.stl') ?? []),
     );
+  });
+});
+
+describe('artifactCount', () => {
+  it('matches the number of artifacts generate actually yields', () => {
+    const image = stripes(64, 64, 8);
+    for (const interlockEnabled of [true, false]) {
+      const p = testParams({ interlockEnabled });
+      const produced = [...generate(image, p, { verify: false })];
+      expect(produced.length).toBe(artifactCount(p));
+    }
+  });
+
+  it('counts one stl per tile plus the maps and manifest', () => {
+    expect(artifactCount(testParams({ rows: 3, columns: 4, interlockEnabled: false }))).toBe(12 + 3);
   });
 });
