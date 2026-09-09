@@ -40,6 +40,33 @@ export function estimateTotalTriangles(p: Params): number {
 }
 
 /**
+ * Size of the exported zip's contents, in bytes, before compression.
+ *
+ * Counts one connector file rather than the whole print run of them, because
+ * this answers "how big is the download", not "how much do I print".
+ */
+export function estimateExportBytes(p: Params): number {
+  const grid = resolveGrid(p);
+  const nx = grid.tileSamplesX + 1;
+  const ny = grid.tileSamplesY + 1;
+  const topTriangles = (nx - 1) * (ny - 1) * 2;
+  const ringLength = 2 * (nx - 1) + 2 * (ny - 1);
+  const sideTriangles = ringLength * 2;
+
+  let bytes = 0;
+  for (let row = 0; row < p.rows; row++) {
+    for (let column = 0; column < p.columns; column++) {
+      const n = neighboursOf(p, row, column);
+      const hasRebateField = p.interlockEnabled && (n.north || n.south || n.east || n.west);
+      const bottomTriangles = hasRebateField || p.magnetsEnabled ? topTriangles : ringLength;
+      bytes += 84 + 50 * (topTriangles + bottomTriangles + sideTriangles);
+    }
+  }
+  if (p.interlockEnabled) bytes += 84 + 50 * 14;
+  return bytes;
+}
+
+/**
  * Rough solid-volume estimate for the whole panel, read from a heightmap that
  * may be sampled at a coarser (preview) pitch. Each grid cell is treated as a
  * slab from z = 0 up to the average of its four corner heights, so the figure

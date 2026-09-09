@@ -71,7 +71,7 @@ export const DEFAULT_PARAMS: Params = {
 
   baseThicknessMm: 2,
   reliefHeightMm: 3.75,
-  samplePitchMm: 0.8,
+  samplePitchMm: 0.4,
   previewPitchMm: 2.5,
 
   invert: false,
@@ -153,8 +153,13 @@ export function validate(p: Params): ValidationIssue[] {
   }
 
   const grid = resolveGrid(p);
-  if (grid.pitchX > p.bevelWidthMm || grid.pitchY > p.bevelWidthMm) {
-    warn(`Sample pitch (${grid.pitchX.toFixed(2)} mm) is coarser than the bevel band; the slope will look stepped.`);
+  const bevelSamples = p.bevelWidthMm / Math.max(grid.pitchX, grid.pitchY);
+  if (bevelSamples + 1e-9 < 3) {
+    warn(
+      `The bevel spans only ${bevelSamples.toFixed(1)} samples at a ${grid.pitchX.toFixed(2)} mm pitch. ` +
+        'Below three the fillet profile cannot form and edges print as stepped cliffs; ' +
+        'reduce the sample pitch or widen the bevel.',
+    );
   }
   if (p.interlockEnabled && p.rebateWidthMm < grid.pitchX * 3) {
     warn('Rebate width spans fewer than three samples and will be badly quantised.');

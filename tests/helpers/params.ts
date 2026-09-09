@@ -14,6 +14,7 @@ export function testParams(overrides: Partial<Params> = {}): Params {
     samplePitchMm: 1,
     previewPitchMm: 3,
     tileEdgeChamferMm: 3,
+    bevelWidthMm: 3,
     rebateLengthMm: 12,
     rebateWidthMm: 6,
     magnetDiameterMm: 8,
