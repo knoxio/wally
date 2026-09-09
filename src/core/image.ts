@@ -62,6 +62,44 @@ export function panelToPixel(
 const wrapIndex = (i: number, n: number): number => ((i % n) + n) % n;
 const clampIndex = (i: number, n: number): number => (i < 0 ? 0 : i > n - 1 ? n - 1 : i);
 
+/**
+ * Average luminance over a source-pixel footprint, for when the panel grid is
+ * coarser than the image.
+ *
+ * Point-sampling a pattern that carries several source pixels per output sample
+ * throws most of the image away and aliases every curved edge into a staircase,
+ * which then prints as a visible comb along the side of each ridge. Averaging
+ * the footprint instead turns the edge into a grey ramp, which is what lets the
+ * distance field place the boundary between samples rather than on one.
+ *
+ * `footprintX`/`footprintY` are the sample spacing measured in source pixels.
+ * At or below one pixel there is nothing to average and this is bilinear.
+ */
+export function sampleLuminanceArea(
+  image: RasterImage,
+  u: number,
+  v: number,
+  wrap: boolean,
+  footprintX: number,
+  footprintY: number,
+): number {
+  const nx = Math.min(MAX_FOOTPRINT_TAPS, Math.max(1, Math.round(footprintX)));
+  const ny = Math.min(MAX_FOOTPRINT_TAPS, Math.max(1, Math.round(footprintY)));
+  if (nx === 1 && ny === 1) return sampleLuminance(image, u, v, wrap);
+
+  let total = 0;
+  for (let j = 0; j < ny; j++) {
+    const dv = ((j + 0.5) / ny - 0.5) * footprintY;
+    for (let i = 0; i < nx; i++) {
+      const du = ((i + 0.5) / nx - 0.5) * footprintX;
+      total += sampleLuminance(image, u + du, v + dv, wrap);
+    }
+  }
+  return total / (nx * ny);
+}
+
+const MAX_FOOTPRINT_TAPS = 4;
+
 /** Bilinear luminance sample at a pixel coordinate, wrapping or clamping at the borders. */
 export function sampleLuminance(image: RasterImage, u: number, v: number, wrap: boolean): number {
   const x0 = Math.floor(u - 0.5);
